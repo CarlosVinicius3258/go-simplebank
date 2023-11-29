@@ -1,6 +1,7 @@
 package db
 
 import (
+	"context"
 	"database/sql"
 	"log"
 	"os"
@@ -15,7 +16,9 @@ const (
 	dbDriver = "postgres"
 	dbSource = "postgresql://root:secret@localhost:5432/simple_bank?sslmode=disable"
 )
-
+func GetContext() context.Context{
+	return context.Background()
+}
 func TestMain(m* testing.M){
 	conn, err:= sql.Open(dbDriver, dbSource)
 	if err != nil {
