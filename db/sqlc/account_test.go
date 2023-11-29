@@ -1,16 +1,13 @@
 package db
 
 import (
-	"context"
 	"testing"
 	"time"
 
-	"github.com/CarlosVinicius3258/simplebank/util"
+	"github.com/CarlosVinicius3258/go-simplebank/util"
 	"github.com/stretchr/testify/require"
 )
-func getContext() context.Context{
-	return context.Background()
-}
+
 func createRandomAccount(t *testing.T) Account{
 	arg:= CreateAccountParams{
 			Owner: util.RandomOwner(), // randomly generated?
@@ -18,7 +15,7 @@ func createRandomAccount(t *testing.T) Account{
 			Currency: util.RandomCurrency(),
 		}
 
-	account, err := testQueries.CreateAccount(getContext(),arg)
+	account, err := testQueries.CreateAccount(GetContext(),arg)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, account)
@@ -38,7 +35,7 @@ func TestCreateAccount(t *testing.T){
 
 func TestGetAccount(t *testing.T){
 	account := createRandomAccount(t)
-	output, err := testQueries.GetAccount(getContext(), account.ID)
+	output, err := testQueries.GetAccount(GetContext(), account.ID)
 	require.NoError(t, err)
 	require.NotEmpty(t, output)
 	require.Equal(t, account.ID, output.ID)
@@ -54,7 +51,7 @@ func TestUpdateAccount(t *testing.T){
 		ID: account.ID,
 		Balance: util.RandomMoney(),
 	}
-	output, err := testQueries.UpdateAccount(getContext(), updatedAccount)
+	output, err := testQueries.UpdateAccount(GetContext(), updatedAccount)
 	require.NoError(t, err)
 	require.NotEmpty(t, output)
 	require.Equal(t, account.ID, output.ID)
@@ -69,9 +66,9 @@ func TestUpdateAccount(t *testing.T){
 
 func TestDeleteAccount(t *testing.T){
 	account:= createRandomAccount(t)
-	err := testQueries.DeleteAccount(getContext(), account.ID)
+	err := testQueries.DeleteAccount(GetContext(), account.ID)
 	require.NoError(t, err)
-	output, err := testQueries.GetAccount(getContext(), account.ID)
+	output, err := testQueries.GetAccount(GetContext(), account.ID)
 	require.Error(t, err)
 	require.Empty(t, output)
 	
@@ -87,7 +84,7 @@ func TestListAccount(t *testing.T){
 		Offset: 5,
 	}
 
-	accounts, err := testQueries.ListAccounts(getContext(), arg)
+	accounts, err := testQueries.ListAccounts(GetContext(), arg)
 	require.NoError(t, err)
 	require.Len(t, accounts, 5)
 
