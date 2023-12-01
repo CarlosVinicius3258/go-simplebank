@@ -21,6 +21,7 @@ func NewStore(db *sql.DB) *Store{
 
 
 
+
 func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
 	tx,err := store.db.BeginTx(ctx, nil)
 	if err !=nil{
@@ -62,11 +63,14 @@ func (store *Store) TransferTx(ctx context.Context, arg TransferTxParams) (Trans
 
 	err := store.execTx(ctx, func(q *Queries) error{
 		var err error
+
 		result.Transfer, err = q.CreateTransfer(ctx, CreateTransferParams{
 			FromAccountID: arg.FromAccountID,
 			ToAccountID: arg.ToAccountID,
 			Amount: arg.Amount,
 		})
+
+
 
 		if err != nil{return err}
 
@@ -84,7 +88,22 @@ func (store *Store) TransferTx(ctx context.Context, arg TransferTxParams) (Trans
 
 		if err != nil{return err}
 		
-		// TODO: update accounts' balance  
+		//update accounts' balance
+
+
+
+		result.FromAccount, err = q.AddAccountBalance(ctx, AddAccountBalanceParams{
+			ID: arg.FromAccountID,
+			Amount: -arg.Amount,
+		})
+		if err != nil {return err}
+
+
+		result.ToAccount, err = q.AddAccountBalance(ctx, AddAccountBalanceParams{
+			ID: arg.ToAccountID,
+			Amount: arg.Amount,
+		})
+		if err != nil {return err}
 
 		return nil
 	})
